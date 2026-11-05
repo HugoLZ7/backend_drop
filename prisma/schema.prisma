@@ -12,3 +12,55 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+type Package {
+  weight  Float
+  height  Float
+  width   Float
+  length  Float
+  content String
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  name      String
+  lastName  String
+  gender    Gender
+  dateBirth DateTime
+  phone     String
+  createdAt DateTime @default(now())
+
+  orders Order[]
+}
+
+model Order {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String    @db.ObjectId
+  orderNumber     String    @unique
+  clientEmail     String
+  pickupAddress   String
+  deliveryAddress String
+  clientName      String
+  clientLastName  String
+  areaCode        String
+  clientPhone     String
+  department      String
+  city            String
+  reference       String?
+  indications     String?
+  scheduledDate   DateTime
+  packages        Package[]
+  createdAt       DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+}
