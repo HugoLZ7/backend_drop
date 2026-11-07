@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client';
 import { randomInt } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
+import { FindOrdersQueryDto } from './dto/find-orders-query.dto.js';
 
 @Injectable()
 export class OrdersService {
@@ -38,12 +39,48 @@ export class OrdersService {
     }
   }
 
-  findAll() {
-    return `This action returns all orders`;
-  }
+  //Historial del usuario con filtro de fechas y paginación
+  async findAll(userId: string, query: FindOrdersQueryDto) {
+    const { startDate, endDate, page, limit } = query;
 
-  findOne(id: string) {
-    return `This action returns a #${id} order`;
+    if (startDate && endDate && startDate > endDate) {
+      throw new BadRequestException(
+        'La fecha inicial no puede ser mayor que la fecha final',
+      );
+    }
+
+    const where: Prisma.OrderWhereInput = { userId };
+
+    if (startDate || endDate) {
+      where.createdAt = {};
+      if (startDate) {
+        //Inicio del día en El Salvador (UTC-6)
+        where.createdAt.gte = new Date(
+          `${startDate.slice(0, 10)}T00:00:00-06:00`,
+        );
+      }
+      if (endDate) {
+        //Final del día en El Salvador, para incluir todo ese día
+        where.createdAt.lte = new Date(
+          `${endDate.slice(0, 10)}T23:59:59.999-06:00`,
+        );
+      }
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   //Crear el numero de orden random
@@ -51,7 +88,7 @@ export class OrdersService {
     return randomInt(1_000_000, 10_000_000).toString();
   }
 
-  //Validador de fecha valida, debe ser hoy o fexhas proximas
+  //Validador de fecha valida, debe ser hoy o fechas proximas
   private parseScheduledDate(value: string): Date {
     const day = value.slice(0, 10);
     const today = new Date().toLocaleDateString('en-CA', {

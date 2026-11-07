@@ -3,14 +3,15 @@ import {
   Get,
   Post,
   Body,
-  Param,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import type { AuthRequest } from '../auth/interfaces/auth-request.interface.js';
+import { FindOrdersQueryDto } from './dto/find-orders-query.dto.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('orders')
@@ -23,12 +24,7 @@ export class OrdersController {
   }
 
   @Get()
-  findAll() {
-    return this.ordersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(id);
+  findAll(@Query() query: FindOrdersQueryDto, @Req() req: AuthRequest) {
+    return this.ordersService.findAll(req.user.userId, query);
   }
 }
