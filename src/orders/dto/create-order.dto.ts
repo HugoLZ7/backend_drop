@@ -55,6 +55,11 @@ export class CreateOrderDto {
   @MaxLength(100)
   city: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(10)
+  areaCode: string;
+
   @IsOptional()
   @IsString()
   @MaxLength(255)

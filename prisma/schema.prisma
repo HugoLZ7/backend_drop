@@ -53,6 +53,7 @@ model Order {
   clientPhone     String
   department      String
   city            String
+  areaCode        String
   reference       String?
   indications     String?
   scheduledDate   DateTime
