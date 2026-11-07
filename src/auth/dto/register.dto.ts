@@ -31,6 +31,11 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(10)
+  areaCode: string;
+
+  @IsString()
+  @IsNotEmpty()
   @MaxLength(20)
   phone: string;
 

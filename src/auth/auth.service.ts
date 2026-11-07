@@ -32,6 +32,7 @@ export class AuthService {
       gender: dto.gender,
       dateBirth: new Date(dto.dateBirth),
       email,
+      areaCode: dto.areaCode,
       phone: dto.phone,
       password: hashedPassword,
     });
