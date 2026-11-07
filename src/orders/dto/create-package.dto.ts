@@ -1,25 +1,32 @@
-import { IsNotEmpty, IsNumber, IsPositive, IsString, Max, MaxLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+  Max,
+  MaxLength,
+} from 'class-validator';
 
 export class CreatePackageDto {
   @IsNumber()
   @IsPositive()
   @Max(500)
-  length: number; 
+  length: number;
 
   @IsNumber()
   @IsPositive()
   @Max(500)
-  height: number; 
+  height: number;
 
   @IsNumber()
   @IsPositive()
   @Max(500)
-  width: number; 
+  width: number;
 
   @IsNumber()
   @IsPositive()
   @Max(1000)
-  weight: number; 
+  weight: number;
 
   @IsString()
   @IsNotEmpty()
