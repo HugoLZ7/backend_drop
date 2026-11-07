@@ -58,7 +58,7 @@ API REST desarrollada como parte de la prueba técnica de Boxful. Permite regist
 
 | Variable | Descripción | Ejemplo |
 |---|---|---|
-| `DATABASE_URL` | Cadena de conexión a MongoDB, incluyendo el nombre de la base de datos | `mongodb+srv://usuario:clave@cluster.mongodb.net/boxful` |
+| `DATABASE_URL` | Cadena de conexión a MongoDB, incluyendo el nombre de la base de datos | `mongodb+srv://<usuario>:<contraseña>@<cluster>/<base_de_datos>` |
 | `JWT_SECRET` | Clave secreta para firmar los tokens. Debe ser larga y aleatoria | Ver el comando siguiente |
 | `JWT_EXPIRES_IN` | Tiempo de expiración del token, en segundos | `86400` (1 día) |
 | `PORT` | Puerto del servidor (opcional) | `3000` |
