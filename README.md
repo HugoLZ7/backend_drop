@@ -99,12 +99,14 @@ Las rutas de órdenes requieren el encabezado `Authorization: Bearer <token>`, d
   "gender": "FEMALE",
   "dateBirth": "1998-05-20",
   "email": "ana@mail.com",
+  "areaCode": "+503",
   "phone": "77777777",
   "password": "MiClave123"
 }
 ```
 
 - `gender` acepta `MALE`, `FEMALE` u `OTHER`.
+- `areaCode` es el código de país del teléfono, por ejemplo `+503`.
 - La contraseña debe tener entre 8 y 72 caracteres.
 - Respuesta: `201` con los datos del usuario, sin la contraseña. Si el correo ya existe, responde `409`.
 
