@@ -1,132 +1,192 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Backend Boxful - API de órdenes
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST desarrollada como parte de la prueba técnica de Boxful. Permite registrar usuarios, autenticarlos mediante JWT, crear órdenes de envío y consultar el historial de órdenes con filtros.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tecnologías
 
-## Description
+- NestJS 12
+- TypeScript
+- MongoDB Atlas
+- Prisma ORM 6
+- JWT (`@nestjs/jwt`, `passport-jwt`) y bcrypt
+- class-validator y class-transformer
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Requisitos
 
-## Project setup
+- Node.js 20 o superior
+- npm
+- Una base de datos MongoDB (por ejemplo, un cluster gratuito de MongoDB Atlas)
 
-```bash
-$ npm install
-```
+## Instalación
 
-## Compile and run the project
+1. Clonar el repositorio:
 
-```bash
-# development
-$ npm run start
+   ```bash
+   git clone https://github.com/HugoLZ7/backend_drop.git
+   cd backend_drop
+   ```
 
-# watch mode
-$ npm run start:dev
+2. Instalar las dependencias:
 
-# production mode
-$ npm run start:prod
-```
+   ```bash
+   npm install
+   ```
 
-## Run tests
+3. Crear el archivo `.env` a partir del ejemplo y completar los valores:
 
-```bash
-# unit tests
-$ npm run test
+   ```bash
+   cp .env.example .env
+   ```
 
-# e2e tests
-$ npm run test:e2e
+4. Sincronizar el esquema con la base de datos y generar el cliente de Prisma:
 
-# test coverage
-$ npm run test:cov
-```
+   ```bash
+   npx prisma db push
+   ```
 
-## Deployment
+   Este comando crea los índices definidos en el esquema y genera el cliente de Prisma.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+5. Iniciar el servidor en modo desarrollo:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+   ```bash
+   npm run start:dev
+   ```
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+   La API queda disponible en `http://localhost:3000`.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Variables de entorno
 
-## Observability
+| Variable | Descripción | Ejemplo |
+|---|---|---|
+| `DATABASE_URL` | Cadena de conexión a MongoDB, incluyendo el nombre de la base de datos | `mongodb+srv://usuario:clave@cluster.mongodb.net/boxful` |
+| `JWT_SECRET` | Clave secreta para firmar los tokens. Debe ser larga y aleatoria | Ver el comando siguiente |
+| `JWT_EXPIRES_IN` | Tiempo de expiración del token, en segundos | `86400` (1 día) |
+| `PORT` | Puerto del servidor (opcional) | `3000` |
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project, run this and approve the code it prints at [observe.nestjs.com/link](https://observe.nestjs.com/link) - signing up for free if you have no account:
+Para generar un valor seguro para `JWT_SECRET`:
 
 ```bash
-$ npx @nestjs/observe link
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-It installs `@nestjs/observe`, wires it into `AppModule` and `main.ts`, and writes the app key and secret into `.env`, which every `nest start` script (`start`, `start:dev`, `start:debug`) then loads. In production, set `OBSERVE_APP_KEY` and `OBSERVE_APP_SECRET` in the environment instead.
+## Scripts disponibles
 
-Or do it by hand:
+| Comando | Descripción |
+|---|---|
+| `npm run start:dev` | Inicia el servidor y lo reinicia al detectar cambios |
+| `npm run build` | Compila el proyecto en la carpeta `dist` |
+| `npm run start:prod` | Ejecuta la versión compilada |
+| `npm run format` | Aplica el formato de Prettier al código |
+| `npm run lint` | Revisa el código con oxlint |
 
-```bash
-$ npm install @nestjs/observe
+## Endpoints
+
+Las rutas de órdenes requieren el encabezado `Authorization: Bearer <token>`, donde el token se obtiene en el inicio de sesión.
+
+| Método | Ruta | Autenticación | Descripción |
+|---|---|---|---|
+| POST | `/auth/register` | No | Registra un usuario |
+| POST | `/auth/login` | No | Inicia sesión y devuelve un token |
+| POST | `/orders` | Sí | Crea una orden |
+| GET | `/orders` | Sí | Lista las órdenes del usuario autenticado |
+
+### POST /auth/register
+
+```json
+{
+  "name": "Ana",
+  "lastName": "López",
+  "gender": "FEMALE",
+  "dateBirth": "1998-05-20",
+  "email": "ana@mail.com",
+  "phone": "77777777",
+  "password": "MiClave123"
+}
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/sdk) - it takes a single import and an app key.
+- `gender` acepta `MALE`, `FEMALE` u `OTHER`.
+- La contraseña debe tener entre 8 y 72 caracteres.
+- Respuesta: `201` con los datos del usuario, sin la contraseña. Si el correo ya existe, responde `409`.
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+### POST /auth/login
 
-## Resources
+```json
+{
+  "email": "ana@mail.com",
+  "password": "MiClave123"
+}
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Respuesta: `200` con `{ "access_token": "..." }`. Si las credenciales no son válidas, responde `401`.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### POST /orders
 
-## Support
+```json
+{
+  "pickupAddress": "Colonia Las Magnolias, calle militar 1, San Salvador",
+  "scheduledDate": "2026-12-03",
+  "clientName": "Gabriela Reneé",
+  "clientLastName": "Díaz López",
+  "clientEmail": "gabbydiaz@gmail.com",
+  "areaCode": "+503",
+  "clientPhone": "77777777",
+  "deliveryAddress": "Final 49 Av. Sur y Bulevar Los Próceres, San Salvador",
+  "department": "San Salvador",
+  "city": "San Salvador Centro",
+  "reference": "Cerca de redondel Árbol de la Paz",
+  "indications": "Llamar antes de entregar",
+  "packages": [
+    {
+      "length": 15,
+      "height": 15,
+      "width": 15,
+      "weight": 3,
+      "content": "iPhone 14 Pro Max"
+    }
+  ]
+}
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- `reference` e `indications` son opcionales.
+- `scheduledDate` no puede ser anterior a la fecha actual.
+- `packages` debe contener entre 1 y 50 paquetes. Las medidas están en centímetros y el peso en libras.
+- Respuesta: `201` con la orden creada, incluyendo su número de orden de 7 dígitos.
 
-## Stay in touch
+### GET /orders
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Parámetros opcionales de consulta:
 
-## License
+| Parámetro | Descripción | Valor por defecto |
+|---|---|---|
+| `startDate` | Fecha inicial de creación (`AAAA-MM-DD`) | Sin límite |
+| `endDate` | Fecha final de creación (`AAAA-MM-DD`), incluye todo ese día | Sin límite |
+| `page` | Número de página | `1` |
+| `limit` | Órdenes por página (máximo 100) | `10` |
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Ejemplo: `GET /orders?startDate=2026-01-01&endDate=2026-07-31&page=1&limit=10`
+
+Respuesta:
+
+```json
+{
+  "data": [],
+  "meta": { "total": 0, "page": 1, "limit": 10, "totalPages": 0 }
+}
+```
+
+Las órdenes se devuelven de la más reciente a la más antigua, y cada usuario solo puede ver sus propias órdenes.
+
+## Decisiones de diseño
+
+- **Paquetes embebidos en la orden.** Los paquetes se guardan dentro del documento de la orden, porque siempre se crean y se consultan junto con ella. Así la orden y sus paquetes se guardan en una sola operación.
+- **Índice compuesto `[userId, createdAt]`.** Optimiza la consulta del historial, que siempre filtra por usuario y ordena por fecha de creación.
+- **Número de orden aleatorio de 7 dígitos.** A diferencia de un número secuencial, no permite deducir el volumen de órdenes. La unicidad se garantiza con un índice único en la base de datos.
+- **El usuario se obtiene del token.** El `userId` de una orden nunca se recibe en el cuerpo de la petición, para que un usuario no pueda crear órdenes a nombre de otro.
+- **Zona horaria.** Las fechas de los filtros se interpretan en la hora de El Salvador (UTC-6).
+- **Validación global.** Todas las peticiones se validan con DTOs, y se rechazan los campos que no están definidos en ellos.
+
+## Mejoras pendientes
+
+- Validar en el backend que el departamento, el municipio y el código de área existan en los catálogos. Actualmente estos datos se consultan desde el frontend en APIs externas y el backend solo valida su formato.
+- Reintentar automáticamente la creación de la orden si el número de orden generado ya existe. Actualmente la API responde `409` para que el usuario vuelva a intentarlo.
+- Agregar pruebas unitarias para la lógica de autenticación y de órdenes.
