@@ -39,7 +39,6 @@ export class OrdersService {
     }
   }
 
-  //Historial del usuario con filtro de fechas y paginación
   async findAll(userId: string, query: FindOrdersQueryDto) {
     const { startDate, endDate, page, limit } = query;
 
@@ -54,13 +53,11 @@ export class OrdersService {
     if (startDate || endDate) {
       where.createdAt = {};
       if (startDate) {
-        //Inicio del día en El Salvador (UTC-6)
         where.createdAt.gte = new Date(
           `${startDate.slice(0, 10)}T00:00:00-06:00`,
         );
       }
       if (endDate) {
-        //Final del día en El Salvador, para incluir todo ese día
         where.createdAt.lte = new Date(
           `${endDate.slice(0, 10)}T23:59:59.999-06:00`,
         );
