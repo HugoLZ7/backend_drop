@@ -2,6 +2,8 @@
 
 API REST desarrollada como parte de la prueba técnica de Boxful. Permite registrar usuarios, autenticarlos mediante JWT, crear órdenes de envío y consultar el historial de órdenes con filtros.
 
+La aplicación web que consume esta API se encuentra en el repositorio [frontend_drop](https://github.com/HugoLZ7/frontend_drop).
+
 ## Tecnologías
 
 - NestJS 12
@@ -87,6 +89,7 @@ Las rutas de órdenes requieren el encabezado `Authorization: Bearer <token>`, d
 |---|---|---|---|
 | POST | `/auth/register` | No | Registra un usuario |
 | POST | `/auth/login` | No | Inicia sesión y devuelve un token |
+| GET | `/auth/me` | Sí | Devuelve los datos del usuario autenticado |
 | POST | `/orders` | Sí | Crea una orden |
 | GET | `/orders` | Sí | Lista las órdenes del usuario autenticado |
 
