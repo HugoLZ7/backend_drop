@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -56,5 +57,15 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(payload);
 
     return { access_token: accessToken };
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 }
