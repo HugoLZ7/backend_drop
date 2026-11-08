@@ -4,12 +4,16 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsDateString,
   IsEmail,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
   MaxLength,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 
@@ -69,6 +73,15 @@ export class CreateOrderDto {
   @IsString()
   @MaxLength(500)
   indications?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isCod?: boolean;
+
+  @ValidateIf((order: CreateOrderDto) => order.isCod === true)
+  @IsNumber()
+  @IsPositive()
+  expectedAmount?: number;
 
   @IsArray()
   @ArrayMinSize(1)

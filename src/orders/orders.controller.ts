@@ -27,4 +27,9 @@ export class OrdersController {
   findAll(@Query() query: FindOrdersQueryDto, @Req() req: AuthRequest) {
     return this.ordersService.findAll(req.user.userId, query);
   }
+
+  @Get('balance')
+  getBalance(@Req() req: AuthRequest) {
+    return this.ordersService.getBalance(req.user.userId);
+  }
 }

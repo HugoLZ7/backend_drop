@@ -2,12 +2,16 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Order, Prisma } from '@prisma/client';
 import { randomInt } from 'node:crypto';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { FindOrdersQueryDto } from './dto/find-orders-query.dto.js';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto.js';
+import { calculateSettlement, roundMoney } from './settlement.js';
 
 @Injectable()
 export class OrdersService {
@@ -15,17 +19,23 @@ export class OrdersService {
 
   async create(dto: CreateOrderDto, userId: string) {
     const scheduledDate = this.parseScheduledDate(dto.scheduledDate);
+    const shippingCost = await this.getShippingCost(scheduledDate);
+    const isCod = dto.isCod ?? false;
 
     try {
-      return await this.prisma.order.create({
+      const order = await this.prisma.order.create({
         data: {
           //Spread trae toda la informacion del OrderDTO
           ...dto,
           scheduledDate,
+          isCod,
+          expectedAmount: isCod ? dto.expectedAmount : null,
+          shippingCost,
           orderNumber: this.generateOrderNumber(),
           userId,
         },
       });
+      return this.withSettlement(order);
     } catch (error) {
       const isDuplicateNumber =
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -75,9 +85,65 @@ export class OrdersService {
     ]);
 
     return {
-      data,
+      data: data.map((order) => this.withSettlement(order)),
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
+  }
+
+  async markAsDelivered(orderNumber: string, dto: UpdateOrderStatusDto) {
+    const order = await this.prisma.order.findUnique({
+      where: { orderNumber },
+    });
+    if (!order) {
+      throw new NotFoundException('Orden no encontrada');
+    }
+    if (order.status === 'DELIVERED') {
+      throw new ConflictException('La orden ya fue marcada como entregada');
+    }
+
+    const collectedAmount = order.isCod
+      ? (dto.collectedAmount ?? order.expectedAmount)
+      : null;
+
+    const updated = await this.prisma.order.update({
+      where: { orderNumber },
+      data: { status: dto.status, collectedAmount, deliveredAt: new Date() },
+    });
+    return this.withSettlement(updated);
+  }
+
+  async getBalance(userId: string) {
+    const orders = await this.prisma.order.findMany({
+      where: { userId },
+      select: {
+        isCod: true,
+        status: true,
+        shippingCost: true,
+        collectedAmount: true,
+      },
+    });
+
+    const balance = orders.reduce(
+      (total, order) => total + calculateSettlement(order),
+      0,
+    );
+    return { balance: roundMoney(balance) };
+  }
+
+  private withSettlement(order: Order) {
+    return { ...order, settlement: calculateSettlement(order) };
+  }
+
+  private async getShippingCost(scheduledDate: Date) {
+    const rate = await this.prisma.shippingRate.findUnique({
+      where: { dayOfWeek: scheduledDate.getUTCDay() },
+    });
+    if (!rate) {
+      throw new InternalServerErrorException(
+        'No hay tarifa de envío configurada para ese día',
+      );
+    }
+    return rate.cost;
   }
 
   //Crear el numero de orden random
