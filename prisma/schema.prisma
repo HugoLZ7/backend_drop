@@ -19,6 +19,11 @@ enum Gender {
   OTHER
 }
 
+enum OrderStatus {
+  PENDING
+  DELIVERED
+}
+
 type Package {
   weight  Float
   height  Float
@@ -43,9 +48,9 @@ model User {
 }
 
 model Order {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String    @db.ObjectId
-  orderNumber     String    @unique
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String      @db.ObjectId
+  orderNumber     String      @unique
   clientEmail     String
   pickupAddress   String
   deliveryAddress String
@@ -59,9 +64,21 @@ model Order {
   indications     String?
   scheduledDate   DateTime
   packages        Package[]
-  createdAt       DateTime  @default(now())
+  isCod           Boolean     @default(false)
+  expectedAmount  Float?
+  collectedAmount Float?
+  shippingCost    Float
+  status          OrderStatus @default(PENDING)
+  deliveredAt     DateTime?
+  createdAt       DateTime    @default(now())
 
   user User @relation(fields: [userId], references: [id])
 
   @@index([userId, createdAt])
+}
+
+model ShippingRate {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  dayOfWeek Int    @unique
+  cost      Float
 }
